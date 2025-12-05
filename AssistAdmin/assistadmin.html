@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Conhecimentos Específicos - Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      /* Animação do Modal */
+      .modal-enter {
+        animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* Utilitários */
+      .hidden {
+        display: none !important;
+      }
+      .no-select {
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      /* Scrollbar personalizada */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #e0e7ff;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #6366f1;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-slate-100 text-slate-800 min-h-screen flex flex-col overflow-hidden"
+  >
+    <header class="bg-indigo-700 text-white p-4 shadow-lg z-10 shrink-0">
+      <div class="container mx-auto max-w-xl flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <a
+            href="../index.html"
+            class="opacity-80 hover:opacity-100 transition"
+            ><i class="fa-solid fa-arrow-left"></i
+          ></a>
+          <h1 class="font-bold text-lg">
+            <i class="fa-solid fa-briefcase mr-2"></i>Específicos
+          </h1>
+        </div>
+        <div
+          class="text-xs font-bold bg-indigo-800 px-3 py-1 rounded-full border border-indigo-500 shadow-inner"
+        >
+          <span id="score-display">Pontos: 0</span>
+        </div>
+      </div>
+    </header>
+
+    <main
+      class="flex-grow flex flex-col items-center justify-center p-4 w-full relative overflow-y-auto"
+    >
+      <div
+        id="quiz-card"
+        class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 flex flex-col max-h-full"
+      >
+        <div class="w-full bg-slate-100 h-1.5">
+          <div
+            id="progress-bar"
+            class="bg-indigo-500 h-1.5 transition-all duration-500 ease-out"
+            style="width: 0%"
+          ></div>
+        </div>
+
+        <div class="p-6 overflow-y-auto custom-scrollbar">
+          <div class="flex justify-between items-center mb-4">
+            <span
+              id="q-category"
+              class="bg-indigo-50 text-indigo-700 text-[10px] uppercase font-bold px-2 py-1 rounded tracking-wider border border-indigo-100"
+            >
+              Categoria
+            </span>
+            <span id="q-count" class="text-xs font-bold text-slate-400">
+              1/10
+            </span>
+          </div>
+
+          <h2
+            id="q-text"
+            class="text-lg md:text-xl font-semibold text-slate-800 mb-6 leading-relaxed"
+          >
+            ...
+          </h2>
+
+          <div id="options-container" class="space-y-3 pb-2"></div>
+        </div>
+      </div>
+
+      <div
+        id="result-screen"
+        class="hidden w-full max-w-md bg-white rounded-2xl shadow-xl p-8 text-center modal-enter"
+      >
+        <div
+          class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner"
+        >
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800 mb-2">
+          Módulo Concluído!
+        </h2>
+        <p class="text-slate-500 mb-6">
+          Seu desempenho nos Conhecimentos Específicos:
+        </p>
+
+        <div
+          class="text-5xl font-black text-indigo-700 mb-2 tracking-tighter"
+          id="final-score-big"
+        >
+          0
+        </div>
+        <div
+          class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8"
+        >
+          Pontos Totais
+        </div>
+
+        <button
+          onclick="location.reload()"
+          class="w-full bg-slate-800 text-white font-bold py-4 rounded-xl hover:bg-slate-900 transition shadow-lg transform active:scale-95"
+        >
+          <i class="fa-solid fa-rotate-right mr-2"></i> Refazer Quiz
+        </button>
+      </div>
+    </main>
+
+    <div
+      id="feedback-modal"
+      class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-6 transition-opacity duration-200"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden modal-enter transform transition-all scale-100"
+      >
+        <div
+          id="modal-header"
+          class="p-6 text-center transition-colors duration-300"
+        >
+          <div
+            id="modal-icon"
+            class="text-5xl mb-2 drop-shadow-sm scale-110 transform transition-transform duration-500"
+          ></div>
+          <h3 id="modal-title" class="text-xl font-bold text-white mt-2"></h3>
+        </div>
+
+        <div class="p-6 text-center">
+          <div
+            id="modal-message"
+            class="text-slate-600 mb-6 text-sm font-medium leading-relaxed text-left bg-slate-50 p-3 rounded-lg border border-slate-100"
+          ></div>
+
+          <div class="flex flex-col gap-3">
+            <button
+              id="btn-retry"
+              class="hidden w-full py-3.5 px-4 rounded-xl font-bold border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition focus:outline-none"
+            >
+              <i class="fa-solid fa-rotate-left mr-2"></i> Tentar Novamente
+            </button>
+            <button
+              id="btn-next"
+              class="w-full py-3.5 px-4 rounded-xl font-bold text-white shadow-lg transition transform active:scale-95 focus:outline-none"
+            >
+              Próxima <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // === BANCO DE QUESTÕES CORRIGIDO ===
+      const questions = [
+        {
+          id: 36,
+          category: "Orçamento Público",
+          q: "De acordo com o princípio da anualidade (Lei 4.320/64), a Lei Orçamentária deve ser elaborada e autorizada para um período que coincide com:",
+          options: [
+            "O ano civil (1º de jan a 31 de dez).",
+            "O período de 48 meses (PPA).",
+            "O mandato do chefe do executivo.",
+            "O período de sessões legislativas.",
+          ],
+          correct: 0,
+          explanation:
+            "O <strong>Princípio da Anualidade</strong> (ou Periodicidade) estabelece que o orçamento deve referir-se a um período limitado de tempo. No Brasil, esse período coincide com o <strong>ano civil</strong>: de 1º de janeiro a 31 de dezembro.",
+        },
+        {
+          id: 41,
+          category: "Estrutura Organizacional",
+          q: "Empresa que possui especialistas em departamentos (Finanças, RH) mas que também formam equipes temporárias para projetos específicos (ex: novos softwares), operando sob dupla autoridade. Essa estrutura é a:",
+          options: ["Linear.", "Matricial.", "Funcional.", "Linha-Staff."],
+          correct: 1,
+          explanation:
+            "A estrutura <strong>Matricial</strong> combina a estrutura Funcional (departamentos fixos) com a de Projetos. Sua característica principal é a <strong>dupla autoridade</strong>: o funcionário responde ao gerente do departamento e ao gerente do projeto simultaneamente.",
+        },
+        {
+          id: 42,
+          category: "Cultura Organizacional",
+          q: "Sobre os níveis da Cultura Organizacional (Schein), os 'Valores Declarados' são:",
+          options: [
+            "Inconscientes e invisíveis (crenças).",
+            "Visíveis no ambiente (artefatos).",
+            "Referências explícitas em normas e discursos oficiais.",
+            "Comportamentos automáticos do dia a dia.",
+          ],
+          correct: 2,
+          explanation:
+            "Os <strong>Valores Declarados</strong> são aquilo que a empresa 'diz que faz'. Aparecem em estatutos, filosofias, discursos oficiais e estratégias explícitas. Diferem dos artefatos (visíveis) e dos pressupostos básicos (inconscientes).",
+        },
+        {
+          id: 46,
+          category: "Gestão de Materiais",
+          q: "Para que um material seja classificado contabilmente como 'Material de Consumo' (e não Permanente), ele deve atender a critérios como:",
+          options: [
+            "Durabilidade superior a 2 anos.",
+            "Não ser incorporável ao imóvel.",
+            "Fragilidade, perecibilidade ou durabilidade limitada.",
+            "Ter valor superior a 5 salários mínimos.",
+          ],
+          correct: 2,
+          explanation:
+            "São considerados <strong>Materiais de Consumo</strong> aqueles que perdem sua identidade física com o uso, têm durabilidade inferior a 2 anos ou são frágeis/perecíveis (ex: papel, caneta, produtos de limpeza).",
+        },
+        {
+          id: 47,
+          category: "Atendimento ao Público",
+          q: "Cidadão busca serviço, é recebido com muita cortesia e educação, mas o funcionário informa erroneamente o prazo e não resolve o problema. Nesse caso, o cidadão foi:",
+          options: [
+            "Maltratado e mal atendido.",
+            "Bem tratado e bem atendido.",
+            "Maltratado, mas bem atendido.",
+            "Bem tratado, mas mal atendido.",
+          ],
+          correct: 3,
+          explanation:
+            "Existe diferença entre Tratamento e Atendimento:<br>• <strong>Tratamento</strong> refere-se à etiqueta, educação e cortesia.<br>• <strong>Atendimento</strong> refere-se à eficiência e resolução do problema.<br>Se foi educado, mas ineficiente: foi <strong>bem tratado, mas mal atendido</strong>.",
+        },
+        {
+          id: 45,
+          category: "Redação Oficial",
+          q: "Sobre a formalidade e padronização na Redação Oficial (Manual da Presidência):",
+          options: [
+            "A linguagem deve ser rebuscada e literária.",
+            "É dispensável a uniformidade de papéis e formatação.",
+            "Exige uso do padrão culto, impessoalidade e clareza.",
+            "O uso de gírias é permitido em memorandos internos.",
+          ],
+          correct: 2,
+          explanation:
+            "A Redação Oficial deve sempre seguir o <strong>Padrão Culto</strong> da língua, ser <strong>Impessoal</strong> (sem opiniões do autor) e ter <strong>Clareza</strong>. A formalidade diz respeito à polidez e às normas gramaticais, não a usar palavras difíceis (rebuscadas).",
+        },
+        {
+          id: 48,
+          category: "Qualidade no Atendimento",
+          q: "Constitui uma postura INADEQUADA de atendimento ao cliente:",
+          options: [
+            "Apresentar empatia.",
+            "Demonstrar disponibilidade.",
+            "Usar o cliente para desabafar e reclamar do trabalho.",
+            "Ter percepção humana.",
+          ],
+          correct: 2,
+          explanation:
+            "O atendente jamais deve usar o momento do atendimento para <strong>desabafar problemas pessoais ou da empresa</strong> com o cliente (transferência de insatisfação). Isso demonstra falta de profissionalismo e gera má impressão da organização.",
+        },
+        {
+          id: 49,
+          category: "Comunicação",
+          q: "Sobre a comunicação empresarial, a Comunicação INTERNA tem como objetivo:",
+          options: [
+            "Vender produtos aos concorrentes.",
+            "Promover interação e integração entre colaboradores/áreas.",
+            "Divulgar a marca para a sociedade.",
+            "Evitar que os departamentos conversem entre si.",
+          ],
+          correct: 1,
+          explanation:
+            "A Comunicação <strong>Interna</strong> foca no público de dentro (funcionários). Seu objetivo é integrar as equipes, alinhar a cultura, informar sobre metas e promover um bom clima organizacional.",
+        },
+        {
+          id: 50,
+          category: "Motivação",
+          q: "Segundo as teorias motivacionais (baseadas em Maslow/necessidades): 'Os seres humanos sempre desejarão algo a mais'. Isso significa que:",
+          options: [
+            "Uma necessidade satisfeita deixa de ser motivadora.",
+            "O ser humano nunca tem necessidades.",
+            "A motivação independe de carência.",
+            "Apenas dinheiro motiva.",
+          ],
+          correct: 0,
+          explanation:
+            "O comportamento humano é motivado pela <strong>carência</strong> (falta). Assim que uma necessidade é satisfeita (ex: fome), ela deixa de motivar o comportamento, surgindo uma nova necessidade em nível superior (ex: segurança, social).",
+        },
+        {
+          id: 40,
+          category: "Gestão do Conhecimento",
+          q: "Um dos principais impactos positivos da Gestão do Conhecimento nas organizações é:",
+          options: [
+            "Aumentar a burocracia documental.",
+            "Desenvolver sistemas de aprendizagem e transferência de saber.",
+            "Centralizar todas as decisões na chefia.",
+            "Reduzir a inovação.",
+          ],
+          correct: 1,
+          explanation:
+            "A Gestão do Conhecimento visa capturar, organizar e distribuir o conhecimento intelectual da empresa. Isso resulta em <strong>aprendizagem organizacional</strong>, capacitação contínua e inovação, evitando que o conhecimento se perca quando as pessoas saem.",
+        },
+      ];
+
+      // === VARIÁVEIS DE CONTROLE ===
+      let currentIndex = 0;
+      let score = 0;
+      let attempts = 0;
+
+      // === UI ELEMENTS ===
+      const ui = {
+        card: document.getElementById("quiz-card"),
+        resultScreen: document.getElementById("result-screen"),
+        qCategory: document.getElementById("q-category"),
+        qCount: document.getElementById("q-count"),
+        qText: document.getElementById("q-text"),
+        optsContainer: document.getElementById("options-container"),
+        progressBar: document.getElementById("progress-bar"),
+        scoreDisplay: document.getElementById("score-display"),
+        finalScore: document.getElementById("final-score-big"),
+        modal: document.getElementById("feedback-modal"),
+        modalHeader: document.getElementById("modal-header"),
+        modalIcon: document.getElementById("modal-icon"),
+        modalTitle: document.getElementById("modal-title"),
+        modalMsg: document.getElementById("modal-message"),
+        btnRetry: document.getElementById("btn-retry"),
+        btnNext: document.getElementById("btn-next"),
+      };
+
+      // === FUNÇÕES ===
+      function init() {
+        currentIndex = 0;
+        score = 0;
+        loadQuestion();
+      }
+
+      function loadQuestion() {
+        const q = questions[currentIndex];
+        attempts = 0;
+        ui.qCategory.innerText = q.category;
+        ui.qCount.innerText = `${currentIndex + 1}/${questions.length}`;
+        ui.qText.innerHTML = q.q;
+        ui.scoreDisplay.innerText = `Pontos: ${score}`;
+
+        const pct = (currentIndex / questions.length) * 100;
+        ui.progressBar.style.width = `${pct}%`;
+
+        ui.optsContainer.innerHTML = "";
+        q.options.forEach((opt, idx) => {
+          const btn = document.createElement("button");
+          btn.className = `w-full text-left p-4 rounded-xl border-2 border-slate-100 bg-slate-50 hover:bg-white hover:border-indigo-300 hover:shadow-md transition-all duration-200 flex items-center group no-select`;
+          btn.innerHTML = `
+            <span class="w-8 h-8 rounded-full bg-white text-slate-500 font-bold flex items-center justify-center text-xs mr-4 border border-slate-200 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-colors">
+              ${String.fromCharCode(65 + idx)}
+            </span>
+            <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900">${opt}</span>
+          `;
+          btn.onclick = () => handleAnswer(idx);
+          ui.optsContainer.appendChild(btn);
+        });
+      }
+
+      function handleAnswer(selectedIndex) {
+        const q = questions[currentIndex];
+        const isCorrect = selectedIndex === q.correct;
+
+        ui.modal.classList.remove("hidden");
+        if (isCorrect) {
+          if (attempts === 0) score += 10;
+          configureModal("success");
+          ui.modalTitle.innerText = "Resposta Correta!";
+          ui.modalMsg.innerHTML = `<span class="text-emerald-600 font-bold">Muito bom!</span><br><br>${q.explanation}`;
+          ui.btnRetry.classList.add("hidden");
+        } else {
+          attempts++;
+          configureModal("error");
+          ui.modalTitle.innerText = "Resposta Incorreta";
+          ui.modalMsg.innerHTML = `<span class="text-rose-600 font-bold">Atenção ao conceito:</span><br><br>${q.explanation}`;
+          ui.btnRetry.classList.remove("hidden");
+        }
+      }
+
+      function configureModal(type) {
+        if (type === "success") {
+          ui.modalHeader.className = "p-6 text-center bg-emerald-500";
+          ui.modalIcon.innerHTML =
+            '<i class="fa-solid fa-check text-white"></i>';
+          ui.btnNext.className =
+            "w-full py-3.5 px-4 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg transition";
+        } else {
+          ui.modalHeader.className = "p-6 text-center bg-rose-500";
+          ui.modalIcon.innerHTML =
+            '<i class="fa-solid fa-xmark text-white"></i>';
+          ui.btnNext.className =
+            "w-full py-3.5 px-4 rounded-xl font-bold bg-slate-800 text-white hover:bg-slate-900 shadow-lg transition";
+        }
+        ui.btnNext.focus();
+      }
+
+      ui.btnRetry.onclick = () => ui.modal.classList.add("hidden");
+      ui.btnNext.onclick = () => {
+        ui.modal.classList.add("hidden");
+        currentIndex++;
+        if (currentIndex < questions.length) loadQuestion();
+        else showResults();
+      };
+
+      function showResults() {
+        ui.card.classList.add("hidden");
+        ui.resultScreen.classList.remove("hidden");
+        ui.finalScore.innerText = score;
+        ui.scoreDisplay.innerText = `Final: ${score}`;
+      }
+
+      // Inicialização
+      try {
+        init();
+      } catch (e) {
+        console.error("Erro ao iniciar quiz:", e);
+        alert("Ocorreu um erro ao carregar as questões. Verifique o console.");
+      }
+    </script>
+  </body>
+</html>

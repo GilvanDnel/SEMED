@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Língua Portuguesa - Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      /* Animação do Modal */
+      .modal-enter {
+        animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* Utilitários */
+      .hidden {
+        display: none !important;
+      }
+      .no-select {
+        user-select: none;
+        -webkit-user-select: none;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-slate-100 text-slate-800 min-h-screen flex flex-col overflow-hidden"
+  >
+    <header class="bg-blue-700 text-white p-4 shadow-lg z-10 shrink-0">
+      <div class="container mx-auto max-w-xl flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <a
+            href="../index.html"
+            class="opacity-80 hover:opacity-100 transition"
+            ><i class="fa-solid fa-arrow-left"></i
+          ></a>
+          <h1 class="font-bold text-lg">
+            <i class="fa-solid fa-book mr-2"></i>Português
+          </h1>
+        </div>
+        <div
+          class="text-xs font-bold bg-blue-800 px-3 py-1 rounded-full border border-blue-500 shadow-inner"
+        >
+          <span id="score-display">Pontos: 0</span>
+        </div>
+      </div>
+    </header>
+
+    <main
+      class="flex-grow flex flex-col items-center justify-center p-4 w-full relative overflow-y-auto"
+    >
+      <div
+        id="quiz-card"
+        class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 flex flex-col max-h-full"
+      >
+        <div class="w-full bg-slate-100 h-1.5">
+          <div
+            id="progress-bar"
+            class="bg-blue-500 h-1.5 transition-all duration-500 ease-out"
+            style="width: 0%"
+          ></div>
+        </div>
+
+        <div class="p-6 overflow-y-auto custom-scrollbar">
+          <div class="flex justify-between items-center mb-4">
+            <span
+              id="q-category"
+              class="bg-blue-50 text-blue-700 text-[10px] uppercase font-bold px-2 py-1 rounded tracking-wider border border-blue-100"
+            >
+              Categoria
+            </span>
+            <span id="q-count" class="text-xs font-bold text-slate-400">
+              1/10
+            </span>
+          </div>
+
+          <h2
+            id="q-text"
+            class="text-lg md:text-xl font-semibold text-slate-800 mb-6 leading-relaxed"
+          >
+            ...
+          </h2>
+
+          <div id="options-container" class="space-y-3 pb-2"></div>
+        </div>
+      </div>
+
+      <div
+        id="result-screen"
+        class="hidden w-full max-w-md bg-white rounded-2xl shadow-xl p-8 text-center modal-enter"
+      >
+        <div
+          class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner"
+        >
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800 mb-2">
+          Módulo Concluído!
+        </h2>
+        <p class="text-slate-500 mb-6">Veja como foi seu desempenho:</p>
+
+        <div
+          class="text-5xl font-black text-blue-700 mb-2 tracking-tighter"
+          id="final-score-big"
+        >
+          0
+        </div>
+        <div
+          class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8"
+        >
+          Pontos Totais
+        </div>
+
+        <button
+          onclick="location.reload()"
+          class="w-full bg-slate-800 text-white font-bold py-4 rounded-xl hover:bg-slate-900 transition shadow-lg transform active:scale-95"
+        >
+          <i class="fa-solid fa-rotate-right mr-2"></i> Refazer Quiz
+        </button>
+      </div>
+    </main>
+
+    <div
+      id="feedback-modal"
+      class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-6 transition-opacity duration-200"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden modal-enter transform transition-all scale-100"
+      >
+        <div
+          id="modal-header"
+          class="p-6 text-center transition-colors duration-300"
+        >
+          <div
+            id="modal-icon"
+            class="text-5xl mb-2 drop-shadow-sm scale-110 transform transition-transform duration-500"
+          ></div>
+          <h3 id="modal-title" class="text-xl font-bold text-white mt-2"></h3>
+        </div>
+
+        <div class="p-6 text-center">
+          <div
+            id="modal-message"
+            class="text-slate-600 mb-6 text-sm font-medium leading-relaxed text-left bg-slate-50 p-3 rounded-lg border border-slate-100"
+          ></div>
+
+          <div class="flex flex-col gap-3">
+            <button
+              id="btn-retry"
+              class="hidden w-full py-3.5 px-4 rounded-xl font-bold border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition focus:outline-none"
+            >
+              <i class="fa-solid fa-rotate-left mr-2"></i> Tentar Novamente
+            </button>
+            <button
+              id="btn-next"
+              class="w-full py-3.5 px-4 rounded-xl font-bold text-white shadow-lg transition transform active:scale-95 focus:outline-none"
+            >
+              Próxima <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // === BANCO DE QUESTÕES COM EXPLICAÇÕES DIDÁTICAS ===
+      const questions = [
+        {
+          id: 1,
+          category: "Conjunções",
+          q: "No trecho 'Nossa casa é antiga, embora não secular', a oração sublinhada expressa concessão. Assinale a alternativa em que a oração expressa OPOSIÇÃO:",
+          options: [
+            "Nossa casa é antiga, embora não secular...",
+            "Tudo isso é simpático, mas tem seus inconvenientes.",
+            "Voltei de alma ferida, porque se pode trabalhar sem flor...",
+            "Estava imersa em vil desânimo, quando me pousou no nariz...",
+          ],
+          correct: 1,
+          explanation:
+            "A conjunção <strong>'mas'</strong> é uma conjunção coordenativa adversativa. Ela introduz uma ideia de oposição ou contraste direto em relação à oração anterior ('é simpático', 'mas tem inconvenientes'). Já o 'embora' indica concessão (uma ressalva).",
+        },
+        {
+          id: 2,
+          category: "Semântica",
+          q: "Considerando o contexto, assinale a palavra que NÃO mantém o sentido original indicado:",
+          options: [
+            "despropósito (1º§) - desatino; absurdo.",
+            "modesta (2º§) - simples; humilde.",
+            "brandindo (4º§) - escalando; subindo.",
+            "ceifando (4º§) - colhendo; cortando.",
+          ],
+          correct: 2,
+          explanation:
+            "O verbo <strong>brandir</strong> significa agitar, sacudir ou vibrar uma arma ou objeto (neste caso, a escada). O contexto diz que ela saiu 'brandindo a escada', ou seja, agitando-a, e não 'escalando' (subindo) nela naquele momento.",
+        },
+        {
+          id: 3,
+          category: "Intertextualidade",
+          q: "Há uma intertextualidade implícita com o poema de Castro Alves ('O Navio Negreiro') no seguinte fragmento:",
+          options: [
+            "[...] a brisa do Brasil beija e balança, [...]",
+            "[...] o comum, e esse lençol rubro de flores...",
+            "Estava imersa em vil desânimo...",
+            "E com risco de romper o esqueleto...",
+          ],
+          correct: 0,
+          explanation:
+            "O verso '...que a brisa do Brasil beija e balança' é uma citação direta e famosa do poema 'O Navio Negreiro', de Castro Alves. Drummond utiliza esse verso para descrever o movimento das flores buganvílias.",
+        },
+        {
+          id: 4,
+          category: "Figuras de Ling.",
+          q: "Assinale a alternativa que apresenta uma METÁFORA:",
+          options: [
+            "Tudo isso é simpático, mas tem seus inconvenientes.",
+            "[...] e esse lençol rubro de flores, quando vem pintando a primavera.",
+            "Enchi duas cestas enormes...",
+            "Nossa casa é antiga, embora não secular...",
+          ],
+          correct: 1,
+          explanation:
+            "A expressão <strong>'lençol rubro de flores'</strong> é uma metáfora. O autor compara a cobertura densa e vermelha das flores a um lençol, sem usar conectivos de comparação (como 'parece um lençol'), criando uma relação direta de semelhança.",
+        },
+        {
+          id: 5,
+          category: "Crase",
+          q: "Assinale a transcrição onde o acento da crase foi empregado por se tratar de uma expressão adverbial (locução adverbial):",
+          options: [
+            "[...] enfeitada assim à última hora...",
+            "[...] não havia uma triste corola à venda.",
+            "[...] dar um ar meio silvestre... àquela superfície...",
+            "[...] folhas iguais às outras...",
+          ],
+          correct: 0,
+          explanation:
+            "A expressão <strong>'à última hora'</strong> é uma locução adverbial de tempo composta por palavra feminina. A regra diz que locuções adverbiais femininas (às pressas, à noite, à tarde) levam crase.",
+        },
+        {
+          id: 6,
+          category: "Interpretação",
+          q: "De acordo com o texto 'Buganvílias', está em DESACORDO (incorreto):",
+          options: [
+            "Há uma indisposição do cronista com uma cidade que não sabe apreciar suas buganvílias.",
+            "'Buganvílias' dá voz a uma senhora, moradora de uma casa antiga...",
+            "O texto enfatiza uma rede de sensibilidade e uma certa 'loucura mansa'...",
+            "O texto versa sobre as trepadeiras, acentuando a graça de cultivá-las mesmo com riscos.",
+          ],
+          correct: 0,
+          explanation:
+            "O texto <strong>não</strong> apresenta uma indisposição com a cidade ou vizinhos. Pelo contrário, diz que 'os moradores dos edifícios garantem que, vista do alto, a casa vale muito mais... por causa das buganvílias'. A vizinhança aprecia a beleza.",
+        },
+        {
+          id: 7,
+          category: "Argumentação",
+          q: "Que recurso o cronista usa para assegurar a 'confiabilidade' da narrativa (verossimilhança)?",
+          options: [
+            "Enumeração de detalhes improváveis.",
+            "Comentários díspares e polêmicos.",
+            "Dados de uma realidade imaginável que dão prestígio e crédito à narrativa.",
+            "Apoio de exemplos científicos.",
+          ],
+          correct: 2,
+          explanation:
+            "O autor usa elementos cotidianos e críveis (como a greve, a falta de flores à venda, o almoço com convidados) para criar uma <strong>realidade imaginável</strong>. Isso faz com que o leitor acredite na história e se identifique com ela.",
+        },
+        {
+          id: 8,
+          category: "Conjunções",
+          q: "Em '...pois escada de casa velha também é velha...', o termo 'pois' indica valor:",
+          options: ["Final.", "Explicativo.", "Conclusivo.", "Condicional."],
+          correct: 1,
+          explanation:
+            "Neste contexto, o <strong>'pois'</strong> está justificando ou explicando o motivo pelo qual havia 'risco de romper o esqueleto'. Funciona como 'porque' ou 'já que'.",
+        },
+        {
+          id: 9,
+          category: "Texto/Opinião",
+          q: "Qual citação expressa uma opinião clara e subjetiva do articulista/narrador?",
+          options: [
+            "Nossos dois andares enfrentam bem uns três dos edifícios vizinhos.",
+            "A casa pode vir abaixo... mas todo o poder às buganvílias!",
+            "Há dias foi engraçado, porque convidamos um casal...",
+            "Eu, se fosse madame, cortava essas trepadeiras.",
+          ],
+          correct: 1,
+          explanation:
+            "A frase <strong>'todo o poder às buganvílias!'</strong> é uma opinião pessoal enfática, um 'slogan' criado pelo narrador para demonstrar sua preferência absoluta pela beleza das plantas, mesmo em detrimento da segurança da casa.",
+        },
+        {
+          id: 10,
+          category: "Sintaxe (Se)",
+          q: "Indique a oração onde o termo 'SE' possui sentido CONDICIONAL (igual a 'se fosse madame'):",
+          options: [
+            "Isso lhe dará ideia... pois as raízes delas se misturam...",
+            "...não imagina como a nossa modesta alvenaria se transforma...",
+            "...e se a gente deixar entreaberta a janela do banheiro...",
+            "...os ladrilhos também se deixam atapetar...",
+          ],
+          correct: 2,
+          explanation:
+            "Em <strong>'se a gente deixar'</strong>, a partícula 'se' impõe uma condição: o banho de flores só acontece *caso* a janela fique aberta. Nas outras opções, o 'se' é parte integrante do verbo ou pronome reflexivo.",
+        },
+      ];
+
+      // === VARIÁVEIS DE CONTROLE ===
+      let currentIndex = 0;
+      let score = 0;
+      let attempts = 0;
+
+      // === UI ELEMENTS ===
+      const ui = {
+        card: document.getElementById("quiz-card"),
+        resultScreen: document.getElementById("result-screen"),
+        qCategory: document.getElementById("q-category"),
+        qCount: document.getElementById("q-count"),
+        qText: document.getElementById("q-text"),
+        optsContainer: document.getElementById("options-container"),
+        progressBar: document.getElementById("progress-bar"),
+        scoreDisplay: document.getElementById("score-display"),
+        finalScore: document.getElementById("final-score-big"),
+        modal: document.getElementById("feedback-modal"),
+        modalHeader: document.getElementById("modal-header"),
+        modalIcon: document.getElementById("modal-icon"),
+        modalTitle: document.getElementById("modal-title"),
+        modalMsg: document.getElementById("modal-message"),
+        btnRetry: document.getElementById("btn-retry"),
+        btnNext: document.getElementById("btn-next"),
+      };
+
+      function init() {
+        currentIndex = 0;
+        score = 0;
+        loadQuestion();
+      }
+
+      function loadQuestion() {
+        const q = questions[currentIndex];
+        attempts = 0;
+        ui.qCategory.innerText = q.category;
+        ui.qCount.innerText = `${currentIndex + 1}/${questions.length}`;
+        ui.qText.innerText = q.q;
+        ui.scoreDisplay.innerText = `Pontos: ${score}`;
+
+        const pct = (currentIndex / questions.length) * 100;
+        ui.progressBar.style.width = `${pct}%`;
+
+        ui.optsContainer.innerHTML = "";
+        q.options.forEach((opt, idx) => {
+          const btn = document.createElement("button");
+          btn.className = `w-full text-left p-4 rounded-xl border-2 border-slate-100 bg-slate-50 hover:bg-white hover:border-blue-300 hover:shadow-md transition-all duration-200 flex items-center group no-select`;
+          btn.innerHTML = `
+            <span class="w-8 h-8 rounded-full bg-white text-slate-500 font-bold flex items-center justify-center text-xs mr-4 border border-slate-200 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors">
+              ${String.fromCharCode(65 + idx)}
+            </span>
+            <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900">${opt}</span>
+          `;
+          btn.onclick = () => handleAnswer(idx);
+          ui.optsContainer.appendChild(btn);
+        });
+      }
+
+      function handleAnswer(selectedIndex) {
+        const q = questions[currentIndex];
+        const isCorrect = selectedIndex === q.correct;
+
+        ui.modal.classList.remove("hidden");
+
+        if (isCorrect) {
+          if (attempts === 0) score += 10;
+          configureModal("success");
+          ui.modalTitle.innerText = "Correto!";
+          // Mostra a explicação para reforçar o aprendizado
+          ui.modalMsg.innerHTML = `<span class="text-emerald-600 font-bold">Muito bem!</span><br><br>${q.explanation}`;
+          ui.btnRetry.classList.add("hidden");
+        } else {
+          attempts++;
+          configureModal("error");
+          ui.modalTitle.innerText = "Incorreto";
+          // Mostra a explicação didática do erro
+          ui.modalMsg.innerHTML = `<span class="text-rose-600 font-bold">Atenção:</span><br><br>${q.explanation}`;
+          ui.btnRetry.classList.remove("hidden");
+        }
+      }
+
+      function configureModal(type) {
+        if (type === "success") {
+          ui.modalHeader.className = "p-6 text-center bg-emerald-500";
+          ui.modalIcon.innerHTML =
+            '<i class="fa-solid fa-check text-white"></i>';
+          ui.btnNext.className =
+            "w-full py-3.5 px-4 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg transition";
+        } else {
+          ui.modalHeader.className = "p-6 text-center bg-rose-500";
+          ui.modalIcon.innerHTML =
+            '<i class="fa-solid fa-xmark text-white"></i>';
+          ui.btnNext.className =
+            "w-full py-3.5 px-4 rounded-xl font-bold bg-slate-800 text-white hover:bg-slate-900 shadow-lg transition";
+        }
+        ui.btnNext.focus();
+      }
+
+      ui.btnRetry.onclick = () => ui.modal.classList.add("hidden");
+
+      ui.btnNext.onclick = () => {
+        ui.modal.classList.add("hidden");
+        currentIndex++;
+        if (currentIndex < questions.length) loadQuestion();
+        else showResults();
+      };
+
+      function showResults() {
+        ui.card.classList.add("hidden");
+        ui.resultScreen.classList.remove("hidden");
+        ui.finalScore.innerText = score;
+        ui.scoreDisplay.innerText = `Final: ${score}`;
+      }
+
+      init();
+    </script>
+  </body>
+</html>

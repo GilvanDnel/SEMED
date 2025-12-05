@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Legislação e Adm. Pública - Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      /* Animação do Modal */
+      .modal-enter {
+        animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* Utilitários */
+      .hidden {
+        display: none !important;
+      }
+      .no-select {
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      /* Scrollbar personalizada */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #fffbeb;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #fcd34d;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-slate-100 text-slate-800 min-h-screen flex flex-col overflow-hidden"
+  >
+    <header class="bg-amber-600 text-white p-4 shadow-lg z-10 shrink-0">
+      <div class="container mx-auto max-w-xl flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <a
+            href="../index.html"
+            class="opacity-80 hover:opacity-100 transition"
+            ><i class="fa-solid fa-arrow-left"></i
+          ></a>
+          <h1 class="font-bold text-lg">
+            <i class="fa-solid fa-scale-balanced mr-2"></i>Legislação
+          </h1>
+        </div>
+        <div
+          class="text-xs font-bold bg-amber-700 px-3 py-1 rounded-full border border-amber-400 shadow-inner"
+        >
+          <span id="score-display">Pontos: 0</span>
+        </div>
+      </div>
+    </header>
+
+    <main
+      class="flex-grow flex flex-col items-center justify-center p-4 w-full relative overflow-y-auto"
+    >
+      <div
+        id="quiz-card"
+        class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 flex flex-col max-h-full"
+      >
+        <div class="w-full bg-slate-100 h-1.5">
+          <div
+            id="progress-bar"
+            class="bg-amber-500 h-1.5 transition-all duration-500 ease-out"
+            style="width: 0%"
+          ></div>
+        </div>
+
+        <div class="p-6 overflow-y-auto custom-scrollbar">
+          <div class="flex justify-between items-center mb-4">
+            <span
+              id="q-category"
+              class="bg-amber-50 text-amber-700 text-[10px] uppercase font-bold px-2 py-1 rounded tracking-wider border border-amber-100"
+            >
+              Categoria
+            </span>
+            <span id="q-count" class="text-xs font-bold text-slate-400">
+              1/5
+            </span>
+          </div>
+
+          <h2
+            id="q-text"
+            class="text-lg md:text-xl font-semibold text-slate-800 mb-6 leading-relaxed"
+          >
+            ...
+          </h2>
+
+          <div id="options-container" class="space-y-3 pb-2"></div>
+        </div>
+      </div>
+
+      <div
+        id="result-screen"
+        class="hidden w-full max-w-md bg-white rounded-2xl shadow-xl p-8 text-center modal-enter"
+      >
+        <div
+          class="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner"
+        >
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800 mb-2">
+          Módulo Concluído!
+        </h2>
+        <p class="text-slate-500 mb-6">Seu desempenho em Legislação:</p>
+
+        <div
+          class="text-5xl font-black text-amber-600 mb-2 tracking-tighter"
+          id="final-score-big"
+        >
+          0
+        </div>
+        <div
+          class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8"
+        >
+          Pontos Totais
+        </div>
+
+        <button
+          onclick="location.reload()"
+          class="w-full bg-slate-800 text-white font-bold py-4 rounded-xl hover:bg-slate-900 transition shadow-lg transform active:scale-95"
+        >
+          <i class="fa-solid fa-rotate-right mr-2"></i> Refazer Quiz
+        </button>
+      </div>
+    </main>
+
+    <div
+      id="feedback-modal"
+      class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-6 transition-opacity duration-200"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden modal-enter transform transition-all scale-100"
+      >
+        <div
+          id="modal-header"
+          class="p-6 text-center transition-colors duration-300"
+        >
+          <div
+            id="modal-icon"
+            class="text-5xl mb-2 drop-shadow-sm scale-110 transform transition-transform duration-500"
+          ></div>
+          <h3 id="modal-title" class="text-xl font-bold text-white mt-2"></h3>
+        </div>
+
+        <div class="p-6 text-center">
+          <div
+            id="modal-message"
+            class="text-slate-600 mb-6 text-sm font-medium leading-relaxed text-left bg-slate-50 p-3 rounded-lg border border-slate-100"
+          ></div>
+
+          <div class="flex flex-col gap-3">
+            <button
+              id="btn-retry"
+              class="hidden w-full py-3.5 px-4 rounded-xl font-bold border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition focus:outline-none"
+            >
+              <i class="fa-solid fa-rotate-left mr-2"></i> Tentar Novamente
+            </button>
+            <button
+              id="btn-next"
+              class="w-full py-3.5 px-4 rounded-xl font-bold text-white shadow-lg transition transform active:scale-95 focus:outline-none"
+            >
+              Próxima <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // === BANCO DE QUESTÕES (Legislação 26-30) ===
+      const questions = [
+        {
+          id: 26,
+          category: "Dir. Constitucional",
+          q: "Doutrinariamente, o Brasil adotou, respectivamente: a Forma de Governo ________, o Sistema de Governo ________ e a Forma de Estado ________.",
+          options: [
+            "Republicana / Misto / Federativa",
+            "Parlamentarista / Misto / Unitária",
+            "Federativa / Presidencialista / Republicana",
+            "Republicana / Presidencialista / Federativa",
+          ],
+          correct: 3,
+          explanation:
+            "<strong>Memorize:</strong><br>• Forma de <strong>G</strong>overno = <strong>R</strong>epública (O 'R' lembra 'Res Publica').<br>• <strong>S</strong>istema de Governo = <strong>P</strong>residencialismo (Sigo o Presidente).<br>• <strong>F</strong>orma de <strong>E</strong>stado = <strong>F</strong>ederativa (F.E. = Fé).",
+        },
+        {
+          id: 27,
+          category: "Licitações (14.133)",
+          q: "São hipóteses de DISPENSA de licitação, EXCETO:",
+          options: [
+            "Contratação de pequeno valor (obras/serviços de engenharia inferiores a R$ 100 mil).",
+            "Propostas com preços manifestamente inferiores aos de mercado (inexequíveis).",
+            "Licitação deserta (anterior não teve interessados) mantendo as condições.",
+            "Aquisição de peças do fornecedor original durante garantia técnica.",
+          ],
+          correct: 1,
+          explanation:
+            "A opção B descreve um motivo para <strong>desclassificar</strong> uma proposta durante a licitação (preço inexequível), e não uma autorização para 'dispensar' o processo de licitação. As outras opções (valor baixo, licitação deserta, garantia) são casos clássicos de dispensa previstos no Art. 75 da Lei 14.133/21.",
+        },
+        {
+          id: 28,
+          category: "Lei 9.784/99",
+          q: "A motivação dos atos administrativos deve ser explícita. É obrigatório motivar atos que:<br>( ) Neguem ou afetem direitos.<br>( ) Imponham ou agravem deveres/sanções.<br>( ) Anulem ou revoguem atos.<br>( ) Discrepem de pareceres oficiais.",
+          options: ["V, V, V, V", "F, V, F, V", "V, F, V, F", "F, F, V, F"],
+          correct: 0,
+          explanation:
+            "<strong>Todas são verdadeiras.</strong><br>O Art. 50 da Lei 9.784/99 estabelece que a motivação é obrigatória em todas essas situações. Se o ato gera ônus, nega direito, anula algo anterior ou muda um entendimento consolidado, o administrador DEVE explicar o porquê.",
+        },
+        {
+          id: 29,
+          category: "Prazos (Lei 9.784)",
+          q: "Complete os prazos da Lei de Processo Administrativo Federal:<br>I. Intimação: antecedência mínima de ___.<br>II. Parecer de órgão consultivo: prazo máx de ___.<br>III. Decadência para anular atos favoráveis: ___.<br>IV. Prazo para recurso: ___.",
+          options: [
+            "15 dias / 3 dias úteis / 12 anos / 10 dias",
+            "30 dias úteis / 10 dias / 8 anos / 5 dias",
+            "3 dias úteis / 15 dias / 5 anos / 10 dias",
+            "30 dias / 5 dias úteis / 10 anos / 15 dias",
+          ],
+          correct: 2,
+          explanation:
+            "Confira os artigos da Lei 9.784/99:<br>• <strong>3 dias úteis</strong> para intimação (Art. 26, §2º).<br>• <strong>15 dias</strong> para pareceres (Art. 42).<br>• <strong>5 anos</strong> para a Administração anular atos (decadência) (Art. 54).<br>• <strong>10 dias</strong> para interpor recurso (Art. 59).",
+        },
+        {
+          id: 30,
+          category: "Direitos Fundamentais",
+          q: "Sobre Direitos Fundamentais:<br>I. Casa é asilo inviolável, mas permite-se entrada sem consentimento para socorro/desastre/flagrante a qualquer hora.<br>II. É constitucional lei que permite sacrifício ritual de animais em cultos de matriz africana.",
+          options: [
+            "As afirmativas I e II estão corretas.",
+            "I e II incorretas.",
+            "Apenas I correta.",
+            "Apenas II correta.",
+          ],
+          correct: 0,
+          explanation:
+            "<strong>Ambas corretas.</strong><br>I. O art. 5º, XI da CF permite entrada <strong>a qualquer hora</strong> em caso de flagrante, desastre ou socorro (ordem judicial apenas de dia).<br>II. O STF decidiu (RE 494601) que o sacrifício ritual é constitucional, protegido pela liberdade religiosa.",
+        },
+      ];
+
+      // === VARIÁVEIS DE CONTROLE ===
+      let currentIndex = 0;
+      let score = 0;
+      let attempts = 0;
+
+      // === UI ELEMENTS ===
+      const ui = {
+        card: document.getElementById("quiz-card"),
+        resultScreen: document.getElementById("result-screen"),
+        qCategory: document.getElementById("q-category"),
+        qCount: document.getElementById("q-count"),
+        qText: document.getElementById("q-text"),
+        optsContainer: document.getElementById("options-container"),
+        progressBar: document.getElementById("progress-bar"),
+        scoreDisplay: document.getElementById("score-display"),
+        finalScore: document.getElementById("final-score-big"),
+        modal: document.getElementById("feedback-modal"),
+        modalHeader: document.getElementById("modal-header"),
+        modalIcon: document.getElementById("modal-icon"),
+        modalTitle: document.getElementById("modal-title"),
+        modalMsg: document.getElementById("modal-message"),
+        btnRetry: document.getElementById("btn-retry"),
+        btnNext: document.getElementById("btn-next"),
+      };
+
+      // === FUNÇÕES ===
+      function init() {
+        currentIndex = 0;
+        score = 0;
+        loadQuestion();
+      }
+
+      function loadQuestion() {
+        const q = questions[currentIndex];
+        attempts = 0;
+        ui.qCategory.innerText = q.category;
+        ui.qCount.innerText = `${currentIndex + 1}/${questions.length}`;
+        ui.qText.innerHTML = q.q;
+        ui.scoreDisplay.innerText = `Pontos: ${score}`;
+
+        const pct = (currentIndex / questions.length) * 100;
+        ui.progressBar.style.width = `${pct}%`;
+
+        ui.optsContainer.innerHTML = "";
+        q.options.forEach((opt, idx) => {
+          const btn = document.createElement("button");
+          btn.className = `w-full text-left p-4 rounded-xl border-2 border-slate-100 bg-slate-50 hover:bg-white hover:border-amber-300 hover:shadow-md transition-all duration-200 flex items-center group no-select`;
+          btn.innerHTML = `
+            <span class="w-8 h-8 rounded-full bg-white text-slate-500 font-bold flex items-center justify-center text-xs mr-4 border border-slate-200 group-hover:bg-amber-600 group-hover:text-white group-hover:border-amber-600 transition-colors">
+              ${String.fromCharCode(65 + idx)}
+            </span>
+            <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900">${opt}</span>
+          `;
+          btn.onclick = () => handleAnswer(idx);
+          ui.optsContainer.appendChild(btn);
+        });
+      }
+
+      function handleAnswer(selectedIndex) {
+        const q = questions[currentIndex];
+        const isCorrect = selectedIndex === q.correct;
+
+        ui.modal.classList.remove("hidden");
+        if (isCorrect) {
+          if (attempts === 0) score += 20;
+          configureModal("success");
+          ui.modalTitle.innerText = "Resposta Certa!";
+          ui.modalMsg.innerHTML = `<span class="text-emerald-600 font-bold">Correto!</span><br><br>${q.explanation}`;
+          ui.btnRetry.classList.add("hidden");
+        } else {
+          attempts++;
+          configureModal("error");
+          ui.modalTitle.innerText = "Resposta Incorreta";
+          ui.modalMsg.innerHTML = `<span class="text-rose-600 font-bold">Fique atento:</span><br><br>${q.explanation}`;
+          ui.btnRetry.classList.remove("hidden");
+        }
+      }
+
+      function configureModal(type) {
+        if (type === "success") {
+          ui.modalHeader.className = "p-6 text-center bg-emerald-500";
+          ui.modalIcon.innerHTML =
+            '<i class="fa-solid fa-check text-white"></i>';
+          ui.btnNext.className =
+            "w-full py-3.5 px-4 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg transition";
+        } else {
+          ui.modalHeader.className = "p-6 text-center bg-rose-500";
+          ui.modalIcon.innerHTML =
+            '<i class="fa-solid fa-xmark text-white"></i>';
+          ui.btnNext.className =
+            "w-full py-3.5 px-4 rounded-xl font-bold bg-slate-800 text-white hover:bg-slate-900 shadow-lg transition";
+        }
+        ui.btnNext.focus();
+      }
+
+      ui.btnRetry.onclick = () => ui.modal.classList.add("hidden");
+      ui.btnNext.onclick = () => {
+        ui.modal.classList.add("hidden");
+        currentIndex++;
+        if (currentIndex < questions.length) loadQuestion();
+        else showResults();
+      };
+
+      function showResults() {
+        ui.card.classList.add("hidden");
+        ui.resultScreen.classList.remove("hidden");
+        ui.finalScore.innerText = score;
+        ui.scoreDisplay.innerText = `Final: ${score}`;
+      }
+
+      init();
+    </script>
+  </body>
+</html>
